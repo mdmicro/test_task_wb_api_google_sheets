@@ -103,7 +103,7 @@ export async function startService() {
         await fetchAndSaveData();
 
         // Периодический запрос (каждый час)
-        setInterval(fetchAndSaveData, 2 * 60 * 1000);
+        setInterval(fetchAndSaveData, 60 * 60 * 1000);
 
     } catch (error) {
         console.error('Initialization error:', error instanceof Error ? error.message : error);
