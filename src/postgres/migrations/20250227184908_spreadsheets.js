@@ -33,5 +33,6 @@ export async function up(knex) {
  * @returns {Promise<void>}
  */
 export async function down(knex) {
-    return knex.schema.dropTable("tariffs_box");
+    await knex.schema.dropTable("tariffs_box");
+    await knex.schema.dropTable("google_tables");
 }
