@@ -156,15 +156,9 @@ export class GoogleSheetsAction {
         }
     }
 
-    /**
-     * Updates stock coefficients in a specific sheet
-     */
-    public async updateStockCoefficients(
-        spreadsheetId: string,
-        data: StockCoefficient[]
-    ): Promise<void> {
+    // Добавить данные в таблицу spreadsheetId
+    public async updateStockCoefficients(spreadsheetId: string, data: StockCoefficient[]): Promise<void> {
         try {
-            // Convert data to 2D array
             const values = data.map((item) => [
                 item.dt_till_max,
                 item.delivery_and_storage_expr,
@@ -191,48 +185,4 @@ export class GoogleSheetsAction {
             throw error;
         }
     }
-
-    // /**
-    //  * Updates stock coefficients in all N sheets
-    //  */
-    // public async updateAllSheets(data: StockCoefficient[]): Promise<void> {
-    //     const sheetIds = await this.createSheets();
-    //
-    //     for (const sheetId of sheetIds) {
-    //         try {
-    //             await this.updateStockCoefficients(sheetId, data);
-    //         } catch (error) {
-    //             console.error(`Failed to update sheet ${sheetId}:`, error);
-    //         }
-    //     }
-    // }
 }
-
-// Example usage
-// (async () => {
-//     const service = new GoogleSheetsAction();
-//
-//     const sampleData: StockCoefficient[] = [
-//         {
-//             dt_till_max: '2023-12-31',
-//             delivery_and_storage_expr: 1.5,
-//             delivery_base: 100,
-//             delivery_liter: 0.5,
-//             storage_base: 50,
-//             storage_liter: 0.3,
-//             warehouse_name: 'Main Warehouse',
-//         },
-//         // Add more items as needed
-//     ];
-//
-//     try {
-        // Option 1: Create and update all 10 sheets
-        // await service.updateAllSheets(sampleData);
-
-        // Option 2: Work with individual sheets
-        // const sheetIds = await service.createSheets();
-        // await service.updateStockCoefficients(sheetIds[0], sampleData);
-    // } catch (error) {
-    //     console.error('Error in main execution:', error);
-    // }
-// })();
