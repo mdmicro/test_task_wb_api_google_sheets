@@ -8,8 +8,8 @@ import path from 'node:path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
-const SERVICE_ACCOUNT_KEY = path.join(__dirname, '../../src/credential/service-directed-hour-463609-j6-163f14589641.json'); // Путь к JSON-ключу
+// Путь к JSON-ключу сервисного аккаунта
+const SERVICE_ACCOUNT_KEY = path.join(__dirname, '../../src/credential/service-directed-hour-463609-j6-163f14589641.json');
 
 enum UserRole {
     READER = 'reader',
@@ -32,7 +32,7 @@ export class GoogleSheetsInit {
     private jwtClient: JWT;
 
     constructor() {
-        // Initialize JWT client
+        // Инициализация JWT клиента
         this.jwtClient = new JWT({
             email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
             key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
@@ -42,9 +42,7 @@ export class GoogleSheetsInit {
         this.sheets = google.sheets({ version: 'v4', auth: this.jwtClient });
     }
 
-    /**
-     * Creates N Google Sheets, to 1000
-     */
+    // Создание N Google таблиц, до 1000
     public async createSheets(n: number): Promise<string[]> {
         const sheetIds: string[] = [];
         if (n > 1000) {
@@ -63,9 +61,8 @@ export class GoogleSheetsInit {
         return sheetIds;
     }
 
-    /**
-     * Creates a single Google Sheet with the required structure
-     */
+
+    // Создание одиночной таблицы Google с заданной структурой
     private async createSingleSheet(title: string): Promise<string> {
         try {
             const response = await this.sheets.spreadsheets.create({
@@ -89,7 +86,7 @@ export class GoogleSheetsInit {
 
             const spreadsheetId = response.data.spreadsheetId;
 
-            // Set headers
+            // Задать имена колонок в таблице
             await this.sheets.spreadsheets.values.update({
                 spreadsheetId,
                 range: 'stocks_coefs!A1:G1',

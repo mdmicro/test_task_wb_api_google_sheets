@@ -1,3 +1,5 @@
+import { GoogleSheetsInit } from "#utils/google_sheets_init.js";
+
 /**
  * @param {import("knex").Knex} knex
  * @returns {Promise<void>}
@@ -21,6 +23,9 @@ export async function up(knex) {
         table.string('spreadsheetId');
         table.timestamp('created_at').defaultTo(knex.fn.now());
     });
+
+    const googleSheetsInit = new GoogleSheetsInit();
+    await googleSheetsInit.createSheets(10);
 }
 
 /**
