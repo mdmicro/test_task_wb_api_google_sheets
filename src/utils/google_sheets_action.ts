@@ -27,7 +27,7 @@ export interface StockCoefficient {
     warehouse_name: string;
 }
 
-export class GoogleSheetsInit {
+export class GoogleSheetsAction {
     private sheets: any;
     private jwtClient: JWT;
 
@@ -210,7 +210,7 @@ export class GoogleSheetsInit {
 
 // Example usage
 // (async () => {
-//     const service = new GoogleSheetsInit();
+//     const service = new GoogleSheetsAction();
 //
 //     const sampleData: StockCoefficient[] = [
 //         {
