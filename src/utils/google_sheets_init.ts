@@ -1,8 +1,21 @@
-import { google } from 'googleapis';
+import { drive_v3, google } from "googleapis";
 import { JWT } from 'google-auth-library';
 import { v4 as uuidv4 } from 'uuid';
 import knex from '#postgres/knex.js';
-import { shareGoogleSheet } from "#utils/share_google_sheet.js";
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
+const SERVICE_ACCOUNT_KEY = path.join(__dirname, '../../src/credential/service-directed-hour-463609-j6-163f14589641.json'); // Путь к JSON-ключу
+
+enum UserRole {
+    READER = 'reader',
+    WRITER = 'writer',
+    OWNER = 'owner',
+}
 
 export interface StockCoefficient {
     dt_till_max: string;
@@ -44,7 +57,7 @@ export class GoogleSheetsInit {
             sheetIds.push(spreadsheetId);
             await knex('google_tables').insert({spreadsheetId});
 
-            await shareGoogleSheet(spreadsheetId);
+            await this.shareGoogleSheet(spreadsheetId, UserRole.WRITER, process.env.USER_EMAIL);
         }
 
         return sheetIds;
@@ -101,6 +114,48 @@ export class GoogleSheetsInit {
         } catch (error) {
             console.error('Error creating sheet:', error);
             throw error;
+        }
+    }
+
+    // Предоставить доступ к файлу отдельному пользователю с указанным E-Mail
+    public async shareGoogleSheet(spreadsheetId: string, userRole: UserRole, userEmail: string | undefined): Promise<void> {
+        let drive: drive_v3.Drive | undefined;
+
+        if (!userEmail) {
+            console.error('Не задан e-mail пользователя google таблиц в системных переменных. Доступ к таблице не предоставлен');
+            return;
+        }
+
+        try {
+            // Аутентификация через сервисный аккаунт
+            const auth = new google.auth.GoogleAuth({
+                keyFile: SERVICE_ACCOUNT_KEY,
+                scopes: [
+                    'https://www.googleapis.com/auth/drive'
+                ],
+            });
+
+            drive = google.drive({ version: 'v3', auth });
+
+        } catch (e) {
+            console.error(`Ошибка аутентификации к google drive - ${(e as Error).message}`);
+            return;
+        }
+
+        try {
+            // Предоставляем доступ через Google Drive API
+            await drive.permissions.create({
+                fileId: spreadsheetId,
+                requestBody: {
+                    role: userRole,
+                    type: 'user',
+                    emailAddress: userEmail,
+                },
+            });
+
+            console.log(`Доступ для ${process.env.USER_EMAIL} успешно предоставлен!`);
+        } catch (error) {
+            console.error('Ошибка:', (error as Error).message);
         }
     }
 
