@@ -45,11 +45,11 @@ export class GoogleSheetsAction {
             const spreadsheetId = await this.createSingleSheet(title);
             sheetIds.push(spreadsheetId);
 
+            // Сохраняем идентификатора google таблиц в отдельной таблице Postgres
             await knex('google_tables').insert({spread_sheet_id: spreadsheetId});
-
+            // Предоставляем доступ к таблицам обычному пользователю с указанным e-mail
             await this.shareGoogleSheet(spreadsheetId, UserRole.WRITER, process.env.USER_EMAIL);
         }
-
         return sheetIds;
     }
 
