@@ -20,12 +20,9 @@ export async function up(knex) {
 
     await knex.schema.createTable("google_tables", (table) => {
         table.increments('id').primary();
-        table.string('spreadsheetId');
+        table.string('spread_sheet_id');
         table.timestamp('created_at').defaultTo(knex.fn.now());
     });
-
-    const googleSheetsInit = new GoogleSheetsAction();
-    await googleSheetsInit.createSheets(10);
 }
 
 /**

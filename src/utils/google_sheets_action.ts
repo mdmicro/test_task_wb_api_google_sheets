@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import knex from '#postgres/knex.js';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { BoxTariff } from "#utils/interfaces.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,16 +16,6 @@ enum UserRole {
     READER = 'reader',
     WRITER = 'writer',
     OWNER = 'owner',
-}
-
-export interface StockCoefficient {
-    dt_till_max: string;
-    delivery_and_storage_expr: number | null;
-    delivery_base: number | null;
-    delivery_liter: number | null;
-    storage_base: number | null;
-    storage_liter: number | null;
-    warehouse_name: string;
 }
 
 export class GoogleSheetsAction {
@@ -53,14 +44,14 @@ export class GoogleSheetsAction {
             const title = `Stocks_${uuidv4()}`;
             const spreadsheetId = await this.createSingleSheet(title);
             sheetIds.push(spreadsheetId);
-            await knex('google_tables').insert({spreadsheetId});
+
+            await knex('google_tables').insert({spread_sheet_id: spreadsheetId});
 
             await this.shareGoogleSheet(spreadsheetId, UserRole.WRITER, process.env.USER_EMAIL);
         }
 
         return sheetIds;
     }
-
 
     // Создание одиночной таблицы Google с заданной структурой
     private async createSingleSheet(title: string): Promise<string> {
@@ -157,9 +148,9 @@ export class GoogleSheetsAction {
     }
 
     // Добавить данные в таблицу spreadsheetId
-    public async updateStockCoefficients(spreadsheetId: string, data: StockCoefficient[]): Promise<void> {
+    public async updateBoxTariffs(spreadsheetId: string, rowData: BoxTariff[]): Promise<void> {
         try {
-            const values = data.map((item) => [
+            const values = rowData.map((item) => [
                 item.dt_till_max,
                 item.delivery_and_storage_expr,
                 item.delivery_base,
@@ -169,11 +160,22 @@ export class GoogleSheetsAction {
                 item.warehouse_name,
             ]);
 
-            await this.sheets.spreadsheets.values.append({
+            // await this.sheets.spreadsheets.values.append({
+            //     spreadsheetId,
+            //     range: 'stocks_coefs',
+            //     valueInputOption: 'RAW',
+            //     insertDataOption: 'INSERT_ROWS',
+            //     resource: {
+            //         values,
+            //     },
+            // });
+
+            // Обновление строки
+            await this.sheets.spreadsheets.values.update({
                 spreadsheetId,
-                range: 'stocks_coefs',
+                // range: `stocks_coefs!A${rowNumber}:G${rowNumber}`,
+                range: `stocks_coefs`,
                 valueInputOption: 'RAW',
-                insertDataOption: 'INSERT_ROWS',
                 resource: {
                     values,
                 },
@@ -186,3 +188,4 @@ export class GoogleSheetsAction {
         }
     }
 }
+
