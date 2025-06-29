@@ -160,16 +160,6 @@ export class GoogleSheetsAction {
                 item.warehouse_name,
             ]);
 
-            // await this.sheets.spreadsheets.values.append({
-            //     spreadsheetId,
-            //     range: 'stocks_coefs',
-            //     valueInputOption: 'RAW',
-            //     insertDataOption: 'INSERT_ROWS',
-            //     resource: {
-            //         values,
-            //     },
-            // });
-
             // Обновление строки
             await this.sheets.spreadsheets.values.update({
                 spreadsheetId,
