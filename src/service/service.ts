@@ -8,7 +8,6 @@ import { BoxTariffData, BoxTariffItem } from "#utils/interfaces.js";
 
 dotenv.config();
 
-// Преобразует строку с запятой в число (например "47,5" → 47.5)
 function parseDecimal(value: string): number | null {
     if (!value || value === '-') return null;
     return parseFloat(value.replace(',', '.'));
