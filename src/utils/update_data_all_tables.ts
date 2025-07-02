@@ -1,12 +1,9 @@
-import { BoxTariffData } from "#utils/interfaces.js";
+import { BoxTariffData, GoogleSheetList } from "#utils/interfaces.js";
 import { googleSheetsAction } from "#app.js";
 
-export const updateDataAllTables = async (data: BoxTariffData[]) => {
-    const list: { default: { id: string[] } } = await import("../../google_sheets_list.json", { assert: { type: "json" } });
+export const updateDataAllTables = async (data: BoxTariffData[], gTableIds: GoogleSheetList) => {
 
-    for (const spreadSheetId of list?.default.id) {
+    for (const spreadSheetId of gTableIds?.default.id) {
         await googleSheetsAction.updateBoxTariffs(spreadSheetId, data);
     }
-
-
 }

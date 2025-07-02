@@ -24,3 +24,9 @@ export interface BoxTariffData extends BoxTariff {
     created_at?: number;
     updated_at?: unknown | null;
 }
+
+export interface GoogleSheetList {
+    default: {
+        id: string[];
+    };
+}

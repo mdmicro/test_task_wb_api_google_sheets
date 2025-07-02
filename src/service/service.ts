@@ -5,6 +5,10 @@ import { format } from 'date-fns';
 import { REQUEST_API } from "#service/request_api.js";
 import { updateDataAllTables } from "#utils/update_data_all_tables.js";
 import { BoxTariffData, BoxTariffItem } from "#utils/interfaces.js";
+import PQueue from 'p-queue';
+import { gTableIds } from "#app.js";
+
+const queue = new PQueue({concurrency: 1});
 
 dotenv.config();
 
@@ -14,7 +18,7 @@ function parseDecimal(value: string): number | null {
 }
 
 // Запрос к API и сохранение данных
-async function fetchAndSaveData() {
+async function fetchAndSaveData(): Promise<void> {
     const boxTariffData: BoxTariffData[] = [];
 
     try {
@@ -29,7 +33,7 @@ async function fetchAndSaveData() {
         const boxTariffList: BoxTariffItem[] = jsonData.warehouseList;
 
         for(const boxTariff of boxTariffList) {
-            // Подготавливаем данные для вставки
+            // Ремап данных из запроса в БД
             const data: BoxTariffData = {
                 dt_till_max: jsonData.dtTillMax,
                 warehouse_name: boxTariff.warehouseName,
@@ -40,8 +44,8 @@ async function fetchAndSaveData() {
                 storage_liter: parseDecimal(boxTariff.boxStorageLiter),
                 updated_at: null,
             };
-            boxTariffData.push(data);
 
+            // Вставка для нового дня и обновление для текущего дня
             await knex.transaction(async trx => {
                 const existing = await trx('tariffs_box')
                     .where({
@@ -64,26 +68,26 @@ async function fetchAndSaveData() {
                     await trx('tariffs_box').insert(data);
                     }
             });
+
+            boxTariffData.push(data);
         }
 
-        await updateDataAllTables(boxTariffData);
-
-        console.log(`Saved ${boxTariffList.length} tariffs_box for ${knex.fn.now()}`);
+        return queue.add(async ()=>{
+            await updateDataAllTables(boxTariffData, gTableIds);
+            console.log(`Saved ${boxTariffList.length} tariffs_box for ${knex.fn.now()}`);
+        });
 
     } catch (error) {
         console.error('Error:', error instanceof Error ? error.message : error);
     }
 }
 
-// Запуск сервиса
 export async function startService() {
     try {
         console.log('Service started. First request will be executed immediately.');
-        // Первый запрос сразу при старте
         await fetchAndSaveData();
-        // Периодический запрос (каждый час)
-        setInterval(fetchAndSaveData, 60 * 60 * 1000);
 
+        setInterval(fetchAndSaveData, 2 * 60 * 1000);
     } catch (error) {
         console.error('Initialization error:', error instanceof Error ? error.message : error);
         process.exit(1);
