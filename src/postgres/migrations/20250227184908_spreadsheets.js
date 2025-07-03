@@ -1,5 +1,3 @@
-import { GoogleSheetsAction } from "#utils/google_sheets_action.js";
-
 /**
  * @param {import("knex").Knex} knex
  * @returns {Promise<void>}
@@ -17,12 +15,6 @@ export async function up(knex) {
         table.timestamp('created_at').defaultTo(knex.fn.now());
         table.timestamp('updated_at').defaultTo(null)
     });
-
-    await knex.schema.createTable("google_tables", (table) => {
-        table.increments('id').primary();
-        table.string('spread_sheet_id');
-        table.timestamp('created_at').defaultTo(knex.fn.now());
-    });
 }
 
 /**
@@ -31,5 +23,4 @@ export async function up(knex) {
  */
 export async function down(knex) {
     await knex.schema.dropTable("tariffs_box");
-    await knex.schema.dropTable("google_tables");
 }
