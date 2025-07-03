@@ -87,7 +87,7 @@ export async function startService() {
         console.log('Service started. First request will be executed immediately.');
         await fetchAndSaveData();
 
-        setInterval(fetchAndSaveData, 2 * 60 * 1000);
+        setInterval(fetchAndSaveData, 60 * 60 * 1000);
     } catch (error) {
         console.error('Initialization error:', error instanceof Error ? error.message : error);
         process.exit(1);
