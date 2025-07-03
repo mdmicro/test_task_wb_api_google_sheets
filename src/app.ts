@@ -4,7 +4,8 @@ import { GoogleSheetsAction } from "#utils/google_sheets_action.js";
 import { GoogleSheetList } from "#utils/interfaces.js";
 
 export const googleSheetsAction = new GoogleSheetsAction();
-export const gTableIds: GoogleSheetList = await import("../google_sheets_list.json", { assert: { type: "json" } });
+export const gTableIds: GoogleSheetList = await import("./credential/google_sheets_list.json", { with: { type: "json" } });
 
 await migrate.latest();
+console.log(`ENV: ${process.env.USER_EMAIL}`);
 await startService();
