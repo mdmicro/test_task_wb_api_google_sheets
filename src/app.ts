@@ -7,5 +7,5 @@ export const googleSheetsAction = new GoogleSheetsAction();
 export const gTableIds: GoogleSheetList = await import("./credential/google_sheets_list.json", { with: { type: "json" } });
 
 await migrate.latest();
-console.log(`ENV: ${process.env.USER_EMAIL}`);
 await startService();
+
