@@ -3,4 +3,16 @@
 2. После обновления данных тарифов в БД данные по тарифам обновляются в google таблицах на вкладке 'stocks_coefs'.
 3. При этом google таблицы создаются предварительно вручную от имени пользователя 'USER_EMAIL'. После чего необходимо 
 предоставить доступ к этим таблицам для сервисного аккаунта, которые обеспечивает обновление данных в таблицах по API.
-4. id google таблиц необходимо разместить в файле google_sheets_list.json в массиве строк 'id'
+4. id google таблиц необходимо разместить в файле google_sheets_list.json
+5. В файле .env задать api key для запросов к WB в переменной API_KEY,
+    e-mail сервисного аккаунта google в переменной GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    ключ для API google sheets  в переменной GOOGLE_PRIVATE_KEY
+
+Стартуем из docker командой 
+
+docker compose up
+
+
+или предварительно со сборкой
+
+docker compose up -d --build postgres
